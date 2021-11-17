@@ -2,63 +2,6 @@
   <div class="root full-height q-py-md" v-show="activeAudioKey" v-if="query">
     <div class="q-px-md">
       <span class="text-body1 q-mb-xs"
-        >話速 {{ previewAudioSpeedScale.currentValue.value.toFixed(1) }}</span
-      >
-      <q-slider
-        dense
-        snap
-        :min="0.5"
-        :max="2"
-        :step="0.1"
-        :disable="uiLocked"
-        :model-value="previewAudioSpeedScale.currentValue.value"
-        @update:model-value="setPreviewValue(previewAudioSpeedScale, $event)"
-        @change="setAudioSpeedScale"
-        @wheel="uiLocked || setAudioInfoByScroll(query, $event.deltaY, 'speed')"
-        @pan="setPanning(previewAudioSpeedScale, $event)"
-      />
-    </div>
-    <div class="q-px-md">
-      <span class="text-body1 q-mb-xs"
-        >音高 {{ previewAudioPitchScale.currentValue.value.toFixed(2) }}</span
-      >
-      <q-slider
-        dense
-        snap
-        :min="-0.15"
-        :max="0.15"
-        :step="0.01"
-        :disable="uiLocked"
-        :model-value="previewAudioPitchScale.currentValue.value"
-        @update:model-value="setPreviewValue(previewAudioPitchScale, $event)"
-        @change="setAudioPitchScale"
-        @wheel="uiLocked || setAudioInfoByScroll(query, $event.deltaY, 'pitch')"
-        @pan="setPanning(previewAudioPitchScale, $event)"
-      />
-    </div>
-    <div class="q-px-md">
-      <span class="text-body1 q-mb-xs"
-        >抑揚
-        {{ previewAudioIntonationScale.currentValue.value.toFixed(1) }}</span
-      >
-      <q-slider
-        dense
-        snap
-        :min="0"
-        :max="2"
-        :step="0.01"
-        :disable="uiLocked"
-        :model-value="previewAudioIntonationScale.currentValue.value"
-        @update:model-value="
-          setPreviewValue(previewAudioIntonationScale, $event)
-        "
-        @change="setAudioIntonationScale"
-        @wheel="uiLocked || setAudioInfoByScroll(query, $event.deltaY, 'into')"
-        @pan="setPanning(previewAudioIntonationScale, $event)"
-      />
-    </div>
-    <div class="q-px-md">
-      <span class="text-body1 q-mb-xs"
         >音量 {{ previewAudioVolumeScale.currentValue.value.toFixed(1) }}</span
       >
       <q-slider
@@ -121,6 +64,63 @@
           uiLocked || setAudioInfoByScroll(query, $event.deltaY, 'postPhoneme')
         "
         @pan="setPanning(previewAudioPostPhonemeLength, $event)"
+      />
+    </div>
+    <div class="q-px-md" style="display: none">
+      <span class="text-body1 q-mb-xs"
+        >話速 {{ previewAudioSpeedScale.currentValue.value.toFixed(1) }}</span
+      >
+      <q-slider
+        dense
+        snap
+        :min="0.5"
+        :max="2"
+        :step="0.1"
+        :disable="uiLocked"
+        :model-value="previewAudioSpeedScale.currentValue.value"
+        @update:model-value="setPreviewValue(previewAudioSpeedScale, $event)"
+        @change="setAudioSpeedScale"
+        @wheel="uiLocked || setAudioInfoByScroll(query, $event.deltaY, 'speed')"
+        @pan="setPanning(previewAudioSpeedScale, $event)"
+      />
+    </div>
+    <div class="q-px-md" style="display: none">
+      <span class="text-body1 q-mb-xs"
+        >音高 {{ previewAudioPitchScale.currentValue.value.toFixed(2) }}</span
+      >
+      <q-slider
+        dense
+        snap
+        :min="-0.15"
+        :max="0.15"
+        :step="0.01"
+        :disable="uiLocked"
+        :model-value="previewAudioPitchScale.currentValue.value"
+        @update:model-value="setPreviewValue(previewAudioPitchScale, $event)"
+        @change="setAudioPitchScale"
+        @wheel="uiLocked || setAudioInfoByScroll(query, $event.deltaY, 'pitch')"
+        @pan="setPanning(previewAudioPitchScale, $event)"
+      />
+    </div>
+    <div class="q-px-md" style="display: none">
+      <span class="text-body1 q-mb-xs"
+        >抑揚
+        {{ previewAudioIntonationScale.currentValue.value.toFixed(1) }}</span
+      >
+      <q-slider
+        dense
+        snap
+        :min="0"
+        :max="2"
+        :step="0.01"
+        :disable="uiLocked"
+        :model-value="previewAudioIntonationScale.currentValue.value"
+        @update:model-value="
+          setPreviewValue(previewAudioIntonationScale, $event)
+        "
+        @change="setAudioIntonationScale"
+        @wheel="uiLocked || setAudioInfoByScroll(query, $event.deltaY, 'into')"
+        @pan="setPanning(previewAudioIntonationScale, $event)"
       />
     </div>
   </div>

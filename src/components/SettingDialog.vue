@@ -30,30 +30,32 @@
                 <div class="text-h5">エンジン</div>
               </q-card-actions>
               <q-card-actions class="q-px-md q-py-sm bg-grey-3">
-                <div>エンジンモード</div>
+                <div>エンジンモードはCPUです</div>
                 <q-space />
-                <q-btn-toggle
-                  padding="xs md"
-                  unelevated
-                  v-model="engineMode"
-                  color="white"
-                  text-color="black"
-                  toggle-color="primary"
-                  :options="[
-                    { label: 'CPU', value: 'switchCPU' },
-                    { label: 'GPU', value: 'switchGPU' },
-                  ]"
-                >
-                  <q-tooltip
-                    :delay="500"
-                    anchor="center left"
-                    self="center right"
-                    transition-show="jump-left"
-                    transition-hide="jump-right"
+                <div style="display: none">
+                  <q-btn-toggle
+                    padding="xs md"
+                    unelevated
+                    v-model="engineMode"
+                    color="white"
+                    text-color="black"
+                    toggle-color="primary"
+                    :options="[
+                      { label: 'CPU', value: 'switchCPU' },
+                      { label: 'GPU', value: 'switchGPU' },
+                    ]"
                   >
-                    GPUモードの利用には NVIDIA&trade; GPU が必要です
-                  </q-tooltip>
-                </q-btn-toggle>
+                    <q-tooltip
+                      :delay="500"
+                      anchor="center left"
+                      self="center right"
+                      transition-show="jump-left"
+                      transition-hide="jump-right"
+                    >
+                      GPUモードの利用には NVIDIA&trade; GPU が必要です
+                    </q-tooltip>
+                  </q-btn-toggle>
+                </div>
               </q-card-actions>
             </q-card>
 
@@ -157,28 +159,30 @@
                   </q-tooltip>
                 </q-toggle>
               </q-card-actions>
-              <q-card-actions class="q-px-md q-py-none bg-grey-3">
-                <div>labファイルを生成</div>
-                <q-space />
-                <q-toggle
-                  name="enabled"
-                  align="left"
-                  :model-value="savingSetting.exportLab"
-                  @update:model-value="
-                    handleSavingSettingChange('exportLab', $event)
-                  "
-                >
-                  <q-tooltip
-                    :delay="500"
-                    anchor="center left"
-                    self="center right"
-                    transition-show="jump-left"
-                    transition-hide="jump-right"
+              <div style="display: none">
+                <q-card-actions class="q-px-md q-py-none bg-grey-3">
+                  <div>labファイルを生成</div>
+                  <q-space />
+                  <q-toggle
+                    name="enabled"
+                    align="left"
+                    :model-value="savingSetting.exportLab"
+                    @update:model-value="
+                      handleSavingSettingChange('exportLab', $event)
+                    "
                   >
-                    リップシンク用のlabファイルを生成します
-                  </q-tooltip>
-                </q-toggle>
-              </q-card-actions>
+                    <q-tooltip
+                      :delay="500"
+                      anchor="center left"
+                      self="center right"
+                      transition-show="jump-left"
+                      transition-hide="jump-right"
+                    >
+                      リップシンク用のlabファイルを生成します
+                    </q-tooltip>
+                  </q-toggle>
+                </q-card-actions>
+              </div>
             </q-card>
           </div>
         </q-page>

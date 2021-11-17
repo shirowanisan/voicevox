@@ -25,8 +25,8 @@ module.exports = {
       builderOptions: {
         fileAssociations: [
           {
-            ext: "vvproj",
-            name: "VOICEVOX Project file",
+            ext: "ciproj",
+            name: "COEIROINK on VOICEVOX Project file",
             role: "Editor",
           },
         ],
@@ -38,9 +38,9 @@ module.exports = {
           },
         ],
         // electron-builder installer
-        productName: "VOICEVOX",
-        appId: "jp.hiroshiba.voicevox",
-        copyright: "Hiroshiba Kazuyuki",
+        productName: "COEIROINKonVOICEVOX",
+        appId: "com.coeiroink",
+        copyright: "shirowanisan",
         afterAllArtifactBuild: path.resolve(
           __dirname,
           "build",

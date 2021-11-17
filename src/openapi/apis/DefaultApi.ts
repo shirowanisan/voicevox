@@ -70,6 +70,7 @@ export interface MultiSynthesisMultiSynthesisPostRequest {
 export interface SynthesisSynthesisPostRequest {
     speaker: number;
     audioQuery: AudioQuery;
+    text?: string;
 }
 
 /**
@@ -578,6 +579,10 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         if (requestParameters.speaker !== undefined) {
             queryParameters['speaker'] = requestParameters.speaker;
+        }
+
+        if (requestParameters.text !== undefined) {
+            queryParameters['text'] = requestParameters.text;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

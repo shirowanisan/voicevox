@@ -503,6 +503,7 @@ export const audioStore: VoiceVoxStoreOptions<
           .synthesisSynthesisPost({
             audioQuery: audioItem.query!,
             speaker: audioItem.speaker!,
+            text: audioItem.text,
           })
           .then(async (blob) => {
             audioBlobCache[id] = blob;

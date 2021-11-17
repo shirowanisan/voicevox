@@ -88,7 +88,7 @@ export const projectStore: VoiceVoxStoreOptions<
           filePath = ret[0];
         }
 
-        const projectFileErrorMsg = `VOICEVOX Project file "${filePath}" is a invalid file.`;
+        const projectFileErrorMsg = `COEIROINK on VOICEVOX Project file "${filePath}" is a invalid file.`;
 
         try {
           const buf = await window.electron.readFile({ filePath });

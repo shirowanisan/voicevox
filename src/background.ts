@@ -280,7 +280,9 @@ ipcMainHandle("SHOW_OPEN_DIRECTORY_DIALOG", (_, { title }) => {
 ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", (_, { title }) => {
   return dialog.showSaveDialogSync(win, {
     title,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [
+      { name: "COEIROINK on VOICEVOX Project file", extensions: ["ciproj"] },
+    ],
     properties: ["showOverwriteConfirmation"],
   });
 });
@@ -288,7 +290,9 @@ ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", (_, { title }) => {
 ipcMainHandle("SHOW_PROJECT_LOAD_DIALOG", (_, { title }) => {
   return dialog.showOpenDialogSync(win, {
     title,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [
+      { name: "COEIROINK on VOICEVOX Project file", extensions: ["ciproj"] },
+    ],
     properties: ["openFile"],
   });
 });

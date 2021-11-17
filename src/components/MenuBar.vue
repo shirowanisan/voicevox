@@ -17,7 +17,7 @@
       {{
         (isEdited ? "*" : "") +
         (projectName !== undefined ? projectName + " - " : "") +
-        "VOICEVOX"
+        "COEIROINK on VOICEVOX"
       }}
     </div>
     <q-space />
