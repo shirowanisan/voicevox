@@ -2,7 +2,7 @@
 
 こちらをご確認ください。
 
-[COEIROINKつくよみちゃん利用規約](https://coeiroink.com/audio-character/tsukuyomi-chan)
+[COEIROINKつくよみちゃん利用規約](https://coeiroink.com/character/audio-character/tsukuyomi-chan)
 
 ## 謝辞・クレジット
 

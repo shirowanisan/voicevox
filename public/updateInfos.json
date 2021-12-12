@@ -1,5 +1,10 @@
 [
   {
+    "version": "COEIROINK-0.0.2+VOICEVOX-0.7.5",
+    "descriptions": ["初期状態に音声ライブラリを含むように変更"],
+    "contributors": []
+  },
+  {
     "version": "COEIROINK-0.0.1+VOICEVOX-0.7.5",
     "descriptions": ["初回リリース"],
     "contributors": []
