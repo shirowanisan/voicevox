@@ -30,7 +30,7 @@
                 <div class="text-h5">エンジン</div>
               </q-card-actions>
               <q-card-actions class="q-px-md q-py-sm bg-grey-3">
-                <div>エンジンモードはCPUです</div>
+                <div>エンジンモードはGPUです</div>
                 <q-space />
                 <div style="display: none">
                   <q-btn-toggle
