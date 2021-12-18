@@ -25,7 +25,7 @@
         <q-page ref="scroller" class="relative-absolute-wrapper scroller">
           <div class="q-pa-md row items-start q-gutter-md">
             <!-- Engine Mode Card -->
-            <q-card flat class="setting-card">
+            <q-card flat class="setting-card" style="display: none">
               <q-card-actions>
                 <div class="text-h5">エンジン</div>
               </q-card-actions>

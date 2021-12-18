@@ -2,11 +2,11 @@
 
 こちらをご確認ください。
 
-[COEIROINKつくよみちゃん利用規約](https://coeiroink.com/character/audio-character/tsukuyomi-chan)
+[COEIROINK:つくよみちゃん-利用規約](https://coeiroink.com/character/audio-character/tsukuyomi-chan)
 
 ## 謝辞・クレジット
 
-つくよみちゃんの音声ライブラリは、フリー素材キャラクター「つくよみちゃん」が無料公開している音声データから作られています。
+「つくよみちゃん」の音声ライブラリは、フリー素材キャラクター「つくよみちゃん」が無料公開している音声データから作られています。
 
 ■つくよみちゃん公式サイト
 

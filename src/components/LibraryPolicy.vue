@@ -26,11 +26,7 @@
             v-for="(characterInfo, index) in characterInfos"
             :key="index"
           >
-            <q-item
-              v-if="index % 4 == 0"
-              clickable
-              @click="selectCharacterInfIndex(index)"
-            >
+            <q-item clickable @click="selectCharacterInfIndex(index)">
               <q-item-section>{{ characterInfo.metas.name }}</q-item-section>
             </q-item>
           </template>
