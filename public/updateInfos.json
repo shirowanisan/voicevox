@@ -1,5 +1,10 @@
 [
   {
+    "version": "COEIROINK-0.2.0+VOICEVOX-0.7.5",
+    "descriptions": ["おふとんPの音声ライブラリを追加"],
+    "contributors": []
+  },
+  {
     "version": "COEIROINK-0.1.0+VOICEVOX-0.7.5",
     "descriptions": ["MANAの音声ライブラリを追加"],
     "contributors": []
