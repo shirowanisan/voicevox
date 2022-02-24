@@ -186,7 +186,7 @@
         @pan="speedScaleSlider.qSliderProps.onPan"
       />
     </div>
-    <div class="q-px-md">
+    <div class="q-px-md" style="display: none">
       <span class="text-body1 q-mb-xs"
         >音高 {{ pitchScaleSlider.state.currentValue.value?.toFixed(2) }}</span
       >
@@ -207,7 +207,7 @@
         @pan="pitchScaleSlider.qSliderProps.onPan"
       />
     </div>
-    <div class="q-px-md">
+    <div class="q-px-md" style="display: none">
       <span class="text-body1 q-mb-xs"
         >抑揚
         {{ intonationScaleSlider.state.currentValue.value?.toFixed(2) }}</span
