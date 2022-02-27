@@ -1,5 +1,12 @@
 [
   {
+    "version": "COEIROINK-1.0.1+VOICEVOX-0.10.4",
+    "descriptions": [
+      "PCのユーザー名が日本語名だと起動しない不具合を修正"
+    ],
+    "contributors": []
+  },
+  {
     "version": "COEIROINK-1.0.0+VOICEVOX-0.10.4",
     "descriptions": [
       "高音質化（サンプリング周波数 24Hz → 44.1Hz）",
