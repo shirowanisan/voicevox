@@ -1,5 +1,14 @@
 [
   {
+    "version": "COEIROINK-1.1.0+VOICEVOX-0.10.4",
+    "descriptions": [
+      "つくよみちゃん（れいせい）の音声ライブラリをアップデート",
+      "MANAの音声ライブラリをアップデート",
+      "MYCOEIROINK追加機能を実装"
+    ],
+    "contributors": []
+  },
+  {
     "version": "COEIROINK-1.0.1+VOICEVOX-0.10.4",
     "descriptions": [
       "PCのユーザー名が日本語名だと起動しない不具合を修正"
