@@ -354,10 +354,7 @@ async function runEngine() {
   log.info(`ENGINE mode: ${useGpu ? "GPU" : "CPU"}`);
 
   // エンジンプロセスの起動
-  const enginePath = path.resolve(
-    appDirPath,
-    process.env.ENGINE_PATH ?? "run.exe"
-  );
+  const enginePath = path.resolve(appDirPath, process.env.ENGINE_PATH ?? "run");
   const args = useGpu ? ["--use_gpu"] : [];
 
   log.info(`ENGINE path: ${enginePath}`);
