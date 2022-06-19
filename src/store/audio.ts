@@ -1017,6 +1017,7 @@ export const audioStore: VoiceVoxStoreOptions<
               speaker,
               enableInterrogativeUpspeak:
                 state.experimentalSetting.enableInterrogativeUpspeak,
+              text: audioItem.text,
             },
           ],
         })

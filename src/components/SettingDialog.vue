@@ -27,7 +27,7 @@
         <q-page ref="scroller" class="scroller">
           <div class="q-pa-md row items-start q-gutter-md">
             <!-- Engine Mode Card -->
-            <q-card flat class="setting-card">
+            <q-card flat class="setting-card" style="display: none">
               <q-card-actions>
                 <div class="text-h5">エンジン</div>
               </q-card-actions>
@@ -437,7 +437,10 @@
                 >
                 </q-toggle>
               </q-card-actions>
-              <q-card-actions class="q-px-md q-py-none bg-setting-item">
+              <q-card-actions
+                class="q-px-md q-py-none bg-setting-item"
+                style="display: none"
+              >
                 <div>labファイルを書き出し</div>
                 <div>
                   <q-icon
@@ -564,7 +567,7 @@
                   :option-label="
                     (item) =>
                       `${item / 1000} kHz${
-                        item === 24000 ? '(デフォルト)' : ''
+                        item === 44100 ? '(デフォルト)' : ''
                       }`
                   "
                   @update:model-value="
@@ -633,7 +636,10 @@
                 >
                 </q-toggle>
               </q-card-actions>
-              <q-card-actions class="q-px-md q-py-none bg-setting-item">
+              <q-card-actions
+                class="q-px-md q-py-none bg-setting-item"
+                style="display: none"
+              >
                 <div>疑問文を自動調整</div>
                 <div>
                   <q-icon
@@ -666,7 +672,7 @@
                 </q-toggle>
               </q-card-actions>
             </q-card>
-            <q-card flat class="setting-card">
+            <q-card flat class="setting-card" style="display: none">
               <q-card-actions>
                 <div class="text-h5">データ収集</div>
               </q-card-actions>
@@ -907,11 +913,11 @@ export default defineComponent({
           data: { ...savingSetting.value, [key]: data },
         });
       };
-      if (key === "outputSamplingRate" && data !== 24000) {
+      if (key === "outputSamplingRate" && data !== 44100) {
         $q.dialog({
           title: "出力サンプリングレートを変更します",
           message:
-            "出力サンプリングレートを変更しても、音質は変化しません。また、音声の生成処理に若干時間がかかる場合があります。<br />変更しますか？",
+            "44.1kHzより下げると音質は悪くなります。また、44.1kHzより上げても、音質は変化しない上に、音声の生成処理に若干時間がかかる場合があります。<br />変更しますか？",
           html: true,
           persistent: true,
           ok: {

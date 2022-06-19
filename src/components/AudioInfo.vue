@@ -188,7 +188,8 @@
     </div>
     <div class="q-px-md">
       <span class="text-body1 q-mb-xs"
-        >音高 {{ pitchScaleSlider.state.currentValue.value?.toFixed(2) }}</span
+        >音高(音質劣化)
+        {{ pitchScaleSlider.state.currentValue.value?.toFixed(2) }}</span
       >
       <q-slider
         dense
@@ -209,7 +210,7 @@
     </div>
     <div class="q-px-md">
       <span class="text-body1 q-mb-xs"
-        >抑揚
+        >抑揚(音質劣化)
         {{ intonationScaleSlider.state.currentValue.value?.toFixed(2) }}</span
       >
       <q-slider

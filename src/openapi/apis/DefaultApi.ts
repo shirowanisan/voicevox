@@ -165,6 +165,7 @@ export interface SynthesisSynthesisPostRequest {
     audioQuery: AudioQuery;
     enableInterrogativeUpspeak?: boolean;
     coreVersion?: string;
+    text?: string;
 }
 
 /**
@@ -1580,6 +1581,10 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         if (requestParameters.coreVersion !== undefined) {
             queryParameters['core_version'] = requestParameters.coreVersion;
+        }
+
+        if (requestParameters.text !== undefined) {
+            queryParameters['text'] = requestParameters.text;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

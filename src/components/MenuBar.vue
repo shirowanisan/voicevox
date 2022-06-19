@@ -21,7 +21,7 @@
       {{
         (isEdited ? "*" : "") +
         (projectName !== undefined ? projectName + " - " : "") +
-        "VOICEVOX" +
+        "COEIROINK on VOICEVOX" +
         (currentVersion ? " - Ver. " + currentVersion + " - " : "") +
         (useGpu ? "GPU" : "CPU")
       }}

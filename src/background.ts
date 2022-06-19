@@ -99,13 +99,19 @@ protocol.registerSchemesAsPrivileged([
 const isMac = process.platform === "darwin";
 
 const engineInfos: EngineInfo[] = (() => {
-  const defaultEngineInfosEnv = process.env.DEFAULT_ENGINE_INFOS;
+  // const defaultEngineInfosEnv = process.env.DEFAULT_ENGINE_INFOS;
+  //
+  // if (defaultEngineInfosEnv) {
+  //   return JSON.parse(defaultEngineInfosEnv) as EngineInfo[];
+  // }
+  const defaultEngineInfosEnv: EngineInfo = {
+    key: "9f6389d8-3568-38c2-5630-321fd9abaa58",
+    host: "http://127.0.0.1:50031",
+    executionEnabled: true,
+    executionFilePath: "run.exe",
+  };
 
-  if (defaultEngineInfosEnv) {
-    return JSON.parse(defaultEngineInfosEnv) as EngineInfo[];
-  }
-
-  return [];
+  return [defaultEngineInfosEnv];
 })();
 
 const defaultHotkeySettings: HotkeySetting[] = [
@@ -254,7 +260,7 @@ const store = new Store<{
         exportLab: { type: "boolean", default: false },
         exportText: { type: "boolean", default: false },
         outputStereo: { type: "boolean", default: false },
-        outputSamplingRate: { type: "number", default: 24000 },
+        outputSamplingRate: { type: "number", default: 44100 },
         audioOutputDevice: { type: "string", default: "default" },
       },
       default: {
@@ -266,7 +272,7 @@ const store = new Store<{
         exportLab: false,
         exportText: false,
         outputStereo: false,
-        outputSamplingRate: 24000,
+        outputSamplingRate: 44100,
         audioOutputDevice: "default",
         splitTextWhenPaste: "PERIOD_AND_NEW_LINE",
       },
@@ -957,7 +963,9 @@ ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", async (_, { title, defaultPath }) => {
   const result = await dialog.showSaveDialog(win, {
     title,
     defaultPath,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [
+      { name: "COEIROINK on VOICEVOX Project file", extensions: ["ciproj"] },
+    ],
     properties: ["showOverwriteConfirmation"],
   });
   if (result.canceled) {
@@ -969,7 +977,9 @@ ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", async (_, { title, defaultPath }) => {
 ipcMainHandle("SHOW_PROJECT_LOAD_DIALOG", async (_, { title }) => {
   const result = await dialog.showOpenDialog(win, {
     title,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [
+      { name: "COEIROINK on VOICEVOX Project file", extensions: ["ciproj"] },
+    ],
     properties: ["openFile"],
   });
   if (result.canceled) {

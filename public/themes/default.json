@@ -2,8 +2,8 @@
   "name": "Default",
   "isDark": false,
   "colors": {
-    "primary": "#A5D4AD",
-    "primary-light": "#A5D4AD",
+    "primary": "#E1E1E1",
+    "primary-light": "#E1E1E1",
     "display": "#121212",
     "display-light": "#EBEBEB",
     "display-dark": "#121212",

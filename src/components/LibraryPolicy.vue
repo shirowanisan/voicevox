@@ -18,6 +18,7 @@
           <q-btn
             outline
             color="primary-light"
+            text-color="display-dark"
             icon="keyboard_arrow_left"
             label="戻る"
             @click="selectCharacterInfIndex(undefined)"
