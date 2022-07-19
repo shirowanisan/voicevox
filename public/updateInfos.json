@@ -1,5 +1,13 @@
 [
   {
+    "version": "COEIROINK-1.6.0+VOICEVOX-0.12.3",
+    "descriptions": [
+      "音声ライブラリダウンロード機能の実装",
+      "キャラクター追加・削除時のエラーを修正"
+    ],
+    "contributors": []
+  },
+  {
     "version": "COEIROINK-1.5.0+VOICEVOX-0.12.3",
     "descriptions": [
       "VOICEVOXのバージョンを0.12.3にアップデート",

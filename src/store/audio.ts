@@ -1,4 +1,10 @@
-import { AudioQuery, AccentPhrase, Speaker, SpeakerInfo } from "@/openapi";
+import {
+  AudioQuery,
+  AccentPhrase,
+  Speaker,
+  SpeakerInfo,
+  DownloadInfo,
+} from "@/openapi";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -220,6 +226,12 @@ export const audioStore: VoiceVoxStoreOptions<
       { characterInfos }: { characterInfos: CharacterInfo[] }
     ) {
       state.characterInfos = characterInfos;
+    },
+    SET_DOWNLOAD_INFOS(
+      state,
+      { downloadInfos }: { downloadInfos: DownloadInfo[] }
+    ) {
+      state.downloadInfos = downloadInfos;
     },
     SET_ACTIVE_AUDIO_KEY(state, { audioKey }: { audioKey?: string }) {
       state._activeAudioKey = audioKey;
@@ -607,6 +619,20 @@ export const audioStore: VoiceVoxStoreOptions<
 
       commit("SET_CHARACTER_INFOS", { characterInfos });
     }),
+    LOAD_DOWNLOAD_INFOS: createUILockAction(
+      async ({ state, commit, dispatch }) => {
+        const engineInfo = state.engineInfos[0]; // TODO: 複数エンジン対応
+        if (!engineInfo)
+          throw new Error(`No such engineInfo registered: index == 0`);
+        const downloadInfos = await dispatch("INVOKE_ENGINE_CONNECTOR", {
+          engineKey: engineInfo.key,
+          action: "DownloadInfosDownloadInfosGet",
+          payload: [{}],
+        });
+
+        commit("SET_DOWNLOAD_INFOS", { downloadInfos });
+      }
+    ),
     GENERATE_AUDIO_KEY() {
       const audioKey = uuidv4();
       audioElements[audioKey] = new Audio();

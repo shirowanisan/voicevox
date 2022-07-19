@@ -6,7 +6,12 @@ import {
   StoreOptions,
 } from "./vuex";
 import { Patch } from "immer";
-import { AccentPhrase, AudioQuery, UserDictWord } from "@/openapi";
+import {
+  AccentPhrase,
+  AudioQuery,
+  DownloadInfo,
+  UserDictWord,
+} from "@/openapi";
 import { createCommandMutationTree, PayloadRecipeTree } from "./command";
 import {
   CharacterInfo,
@@ -135,6 +140,14 @@ type AudioStoreTypes = {
 
   SET_CHARACTER_INFOS: {
     mutation: { characterInfos: CharacterInfo[] };
+  };
+
+  LOAD_DOWNLOAD_INFOS: {
+    action(): void;
+  };
+
+  SET_DOWNLOAD_INFOS: {
+    mutation: { downloadInfos: DownloadInfo[] };
   };
 
   USER_ORDERED_CHARACTER_INFOS: {
@@ -891,6 +904,7 @@ export type UiStoreState = {
   isHelpDialogOpen: boolean;
   isSettingDialogOpen: boolean;
   isCharacterOrderDialogOpen: boolean;
+  isCharacterDownloadDialogOpen: boolean;
   isDefaultStyleSelectDialogOpen: boolean;
   isHotkeySettingDialogOpen: boolean;
   isToolbarSettingDialogOpen: boolean;
@@ -981,6 +995,11 @@ type UiStoreTypes = {
   IS_CHARACTER_ORDER_DIALOG_OPEN: {
     mutation: { isCharacterOrderDialogOpen: boolean };
     action(payload: { isCharacterOrderDialogOpen: boolean }): void;
+  };
+
+  IS_CHARACTER_DOWNLOAD_DIALOG_OPEN: {
+    mutation: { isCharacterDownloadDialogOpen: boolean };
+    action(payload: { isCharacterDownloadDialogOpen: boolean }): void;
   };
 
   IS_DEFAULT_STYLE_SELECT_DIALOG_OPEN: {
