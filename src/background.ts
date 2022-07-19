@@ -108,7 +108,7 @@ const engineInfos: EngineInfo[] = (() => {
     key: "9f6389d8-3568-38c2-5630-321fd9abaa58",
     host: "http://127.0.0.1:50031",
     executionEnabled: true,
-    executionFilePath: "run.exe",
+    executionFilePath: "run",
   };
 
   return [defaultEngineInfosEnv];
@@ -468,7 +468,7 @@ async function runEngine(engineKey: string) {
   // エンジンプロセスの起動
   const enginePath = path.resolve(
     appDirPath,
-    engineInfo.executionFilePath ?? "run.exe"
+    engineInfo.executionFilePath ?? "run"
   );
   const args = useGpu ? ["--use_gpu"] : [];
 
