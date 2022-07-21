@@ -23,7 +23,7 @@
         (projectName !== undefined ? projectName + " - " : "") +
         "COEIROINK on VOICEVOX" +
         (currentVersion ? " - Ver. " + currentVersion + " - " : "") +
-        (useGpu ? "GPU" : "CPU")
+        "GPU"
       }}
     </div>
     <q-space />
