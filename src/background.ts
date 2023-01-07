@@ -776,7 +776,7 @@ ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", async (_, { title, defaultPath }) => {
   const result = await dialog.showSaveDialog(win, {
     title,
     defaultPath,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [{ name: "COEIROINK Project file", extensions: ["ciproj"] }],
     properties: ["showOverwriteConfirmation"],
   });
   if (result.canceled) {
@@ -788,7 +788,7 @@ ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", async (_, { title, defaultPath }) => {
 ipcMainHandle("SHOW_PROJECT_LOAD_DIALOG", async (_, { title }) => {
   const result = await dialog.showOpenDialog(win, {
     title,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [{ name: "COEIROINK Project file", extensions: ["ciproj"] }],
     properties: ["openFile"],
   });
   if (result.canceled) {

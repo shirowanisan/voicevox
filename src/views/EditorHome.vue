@@ -713,14 +713,14 @@ export default defineComponent({
         case ".txt":
           store.dispatch("COMMAND_IMPORT_FROM_FILE", { filePath: file.path });
           break;
-        case ".vvproj":
+        case ".ciproj":
           store.dispatch("LOAD_PROJECT_FILE", { filePath: file.path });
           break;
         default:
           $q.dialog({
             title: "対応していないファイルです",
             message:
-              "テキストファイル (.txt) とVOICEVOXプロジェクトファイル (.vvproj) に対応しています。",
+              "テキストファイル (.txt) とCOEIROINKプロジェクトファイル (.ciproj) に対応しています。",
             ok: {
               label: "閉じる",
               flat: true,

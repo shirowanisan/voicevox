@@ -104,7 +104,7 @@ export default defineComponent({
       () =>
         (isEdited.value ? "*" : "") +
         (projectName.value !== undefined ? projectName.value + " - " : "") +
-        "VOICEVOX" +
+        "COEIROINK" +
         (currentVersion.value
           ? " - Ver. " + currentVersion.value + " - "
           : "") +

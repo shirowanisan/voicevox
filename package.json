@@ -1,7 +1,7 @@
 {
-  "name": "voicevox",
-  "version": "999.999.999",
-  "author": "Hiroshiba Kazuyuki",
+  "name": "coeiroink",
+  "version": "1.7.0",
+  "author": "shirowanisan",
   "private": true,
   "engines": {
     "node": ">=16.17.0 <17",
