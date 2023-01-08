@@ -4,8 +4,8 @@
   "order": 2,
   "isDark": true,
   "colors": {
-    "primary": "#C4CEDF",
-    "primary-light": "#C4CEDF",
+    "primary": "#E1E1E1",
+    "primary-light": "#E1E1E1",
     "display": "#E1E1E1",
     "display-on-primary": "#1F1F1F",
     "display-hyperlink": "#58A6FF",
