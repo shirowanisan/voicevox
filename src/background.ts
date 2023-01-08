@@ -885,6 +885,10 @@ ipcMainHandle("ENGINE_INFOS", () => {
   return engineManager.fetchEngineInfos();
 });
 
+ipcMainHandle("APP_DIR_PATH", () => {
+  return appDirPath;
+});
+
 /**
  * エンジンを再起動する。
  * エンジンの起動が開始したらresolve、起動が失敗したらreject。
@@ -992,12 +996,33 @@ ipcMainHandle("WRITE_FILE", (_, { filePath, buffer }) => {
   return undefined;
 });
 
+ipcMainHandle("WRITE_SPEAKER_FILE", (_, { filePath, buffer }) => {
+  try {
+    // throwだと`.code`の情報が消えるのでreturn
+    if (buffer.byteLength === 0) {
+      fs.mkdirSync(filePath, { recursive: true });
+    } else {
+      fs.writeFileSync(filePath, new DataView(buffer));
+    }
+  } catch (e) {
+    const a = e as SystemError;
+    return { code: a.code, message: a.message };
+  }
+
+  return undefined;
+});
+
 ipcMainHandle("JOIN_PATH", (_, { pathArray }) => {
   return path.join(...pathArray);
 });
 
 ipcMainHandle("READ_FILE", (_, { filePath }) => {
   return fs.promises.readFile(filePath);
+});
+
+ipcMainHandle("REMOVE_FILE", (_, { filePath }) => {
+  fs.rmSync(filePath, { recursive: true, force: true });
+  return undefined;
 });
 
 // app callback

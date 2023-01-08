@@ -188,6 +188,11 @@ export type IpcIHData = {
     return: EngineInfo[];
   };
 
+  APP_DIR_PATH: {
+    args: [];
+    return: string;
+  };
+
   RESTART_ENGINE_ALL: {
     args: [];
     return: void;
@@ -281,9 +286,19 @@ export type IpcIHData = {
     return: WriteFileErrorResult | undefined;
   };
 
+  WRITE_SPEAKER_FILE: {
+    args: [obj: { filePath: string; buffer: ArrayBuffer }];
+    return: WriteFileErrorResult | undefined;
+  };
+
   READ_FILE: {
     args: [obj: { filePath: string }];
     return: ArrayBuffer;
+  };
+
+  REMOVE_FILE: {
+    args: [obj: { filePath: string }];
+    return: undefined;
   };
 };
 

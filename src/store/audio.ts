@@ -1,4 +1,10 @@
-import { AudioQuery, AccentPhrase, Speaker, SpeakerInfo } from "@/openapi";
+import {
+  AudioQuery,
+  AccentPhrase,
+  Speaker,
+  SpeakerInfo,
+  DownloadInfo,
+} from "@/openapi";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -326,6 +332,26 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
     },
   },
 
+  LOAD_DOWNLOAD_INFOS: {
+    action: createUILockAction(async ({ state, commit, dispatch }) => {
+      const engineId: string | undefined = state.engineIds[0];
+      if (engineId === undefined)
+        throw new Error(`No such engine registered: index == 0`);
+      const downloadInfos = await dispatch("INSTANTIATE_ENGINE_CONNECTOR", {
+        engineId: engineId,
+      })
+        .then((instance) =>
+          instance.invoke("downloadInfosDownloadInfosGet")({})
+        )
+        .catch((error) => {
+          window.electron.logError(error, `Failed to get download infos.`);
+          throw error;
+        });
+
+      commit("SET_DOWNLOAD_INFOS", { downloadInfos });
+    }),
+  },
+
   GENERATE_AUDIO_KEY: {
     action() {
       const audioKey = uuidv4();
@@ -356,6 +382,12 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
           audioKey: undefined,
         });
       });
+    },
+  },
+
+  SET_DOWNLOAD_INFOS: {
+    mutation(state, { downloadInfos }: { downloadInfos?: DownloadInfo[] }) {
+      state.downloadInfos = downloadInfos;
     },
   },
 

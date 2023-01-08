@@ -68,7 +68,12 @@ export interface Sandbox {
     filePath: string;
     buffer: ArrayBuffer;
   }): Promise<WriteFileErrorResult | undefined>;
+  writeSpeakerFile(obj: {
+    filePath: string;
+    buffer: ArrayBuffer;
+  }): Promise<WriteFileErrorResult | undefined>;
   readFile(obj: { filePath: string }): Promise<ArrayBuffer>;
+  removeFile(obj: { filePath: string }): Promise<undefined>;
   openTextEditContextMenu(): Promise<void>;
   isAvailableGPUMode(): Promise<boolean>;
   isMaximizedWindow(): Promise<boolean>;
@@ -82,6 +87,7 @@ export interface Sandbox {
   logError(...params: unknown[]): void;
   logInfo(...params: unknown[]): void;
   engineInfos(): Promise<EngineInfo[]>;
+  appDirPath(): Promise<string>;
   restartEngineAll(): Promise<void>;
   restartEngine(engineId: string): Promise<void>;
   openEngineDirectory(engineId: string): void;
@@ -125,6 +131,16 @@ export type MetasJson = {
 };
 
 export type CharacterInfo = {
+  portraitPath: string;
+  metas: {
+    speakerUuid: string;
+    speakerName: string;
+    styles: StyleInfo[];
+    policy: string;
+  };
+};
+
+export type CharacterDownloadInfo = {
   portraitPath: string;
   metas: {
     speakerUuid: string;
