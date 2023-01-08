@@ -52,6 +52,15 @@
               class="text-no-wrap"
               @click="closeDialog"
             />
+            <q-btn
+              v-if="multiStyleCharacterInfos.length === 0"
+              unelevated
+              label="完了"
+              color="toolbar-button"
+              text-color="toolbar-button-display"
+              class="text-no-wrap"
+              @click="closeDialog"
+            />
           </div>
         </q-toolbar>
       </q-header>
