@@ -201,7 +201,7 @@
         :class="{
           disabled: pitchScaleSlider.qSliderProps.disable.value,
         }"
-        >音高(音質劣化)
+        >音高
         {{
           pitchScaleSlider.state.currentValue.value != undefined
             ? pitchScaleSlider.state.currentValue.value.toFixed(2)
@@ -232,7 +232,7 @@
         :class="{
           disabled: intonationScaleSlider.qSliderProps.disable.value,
         }"
-        >抑揚(音質劣化)
+        >抑揚
         {{
           intonationScaleSlider.state.currentValue.value != undefined
             ? intonationScaleSlider.state.currentValue.value.toFixed(2)
