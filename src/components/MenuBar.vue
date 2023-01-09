@@ -108,7 +108,7 @@ export default defineComponent({
         (currentVersion.value
           ? " - Ver. " + currentVersion.value + " - "
           : "") +
-        (useGpu.value ? "GPU" : "CPU") +
+        "GPU" +
         (isSafeMode.value ? " - セーフモード" : "")
     );
 
