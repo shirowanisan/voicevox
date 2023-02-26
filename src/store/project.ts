@@ -112,7 +112,7 @@ export const projectStore = createPartialStore<ProjectStoreTypes>({
           };
 
           // Migration
-          const engineId = "074fc39e-678b-4c13-8916-ffca8d505d1d";
+          const engineId = "7505c175-3861-4e04-845f-d1032abbbf1f";
 
           if (
             semver.satisfies(projectAppVersion, "<0.4", semverSatisfiesOptions)
@@ -220,7 +220,7 @@ export const projectStore = createPartialStore<ProjectStoreTypes>({
           }
 
           if (
-            semver.satisfies(projectAppVersion, "<0.14", semverSatisfiesOptions)
+            semver.satisfies(projectAppVersion, "<1.7", semverSatisfiesOptions)
           ) {
             for (const audioItemsKey in projectData.audioItems) {
               const audioItem = projectData.audioItems[audioItemsKey];
