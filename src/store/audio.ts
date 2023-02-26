@@ -24,6 +24,7 @@ import {
   DefaultStyleId,
   Encoding as EncodingType,
   MoraDataType,
+  MorphingInfo,
   StyleInfo,
   WriteFileErrorResult,
 } from "@/type/preload";
@@ -47,7 +48,10 @@ async function generateUniqueIdAndQuery(
   audioItem = JSON.parse(JSON.stringify(audioItem)) as AudioItem;
   const audioQuery = audioItem.query;
   if (audioQuery != undefined) {
-    audioQuery.outputSamplingRate = state.savingSetting.outputSamplingRate;
+    if (audioItem.engineId == undefined)
+      throw new Error(`audioItem.engineId is undefined`);
+    audioQuery.outputSamplingRate =
+      state.engineSettings[audioItem.engineId].outputSamplingRate;
     audioQuery.outputStereo = state.savingSetting.outputStereo;
   }
 
@@ -57,6 +61,7 @@ async function generateUniqueIdAndQuery(
       audioQuery,
       audioItem.engineId,
       audioItem.styleId,
+      audioItem.morphingInfo,
       state.experimentalSetting.enableInterrogativeUpspeak, // このフラグが違うと、同じAudioQueryで違う音声が生成されるので追加
     ])
   );
@@ -72,28 +77,35 @@ function parseTextFile(
   defaultStyleIds: DefaultStyleId[],
   userOrderedCharacterInfos: CharacterInfo[]
 ): AudioItem[] {
-  const characters = new Map<string, number>();
-  const uuid2StyleIds = new Map<string, number>();
+  const characters = new Map<string, { engineId: string; styleId: number }>();
+  const uuid2StyleIds = new Map<
+    string,
+    { engineId: string; styleId: number }
+  >();
   for (const defaultStyleId of defaultStyleIds) {
     const speakerUuid = defaultStyleId.speakerUuid;
+    const engineId = defaultStyleId.engineId;
     const styleId = defaultStyleId.defaultStyleId;
-    uuid2StyleIds.set(speakerUuid, styleId);
+    uuid2StyleIds.set(speakerUuid, { engineId, styleId });
   }
   // setup default characters
   for (const characterInfo of userOrderedCharacterInfos) {
     const uuid = characterInfo.metas.speakerUuid;
-    const styleId = uuid2StyleIds.get(uuid);
+    const style = uuid2StyleIds.get(uuid);
     const speakerName = characterInfo.metas.speakerName;
-    if (styleId == undefined)
-      throw new Error(`styleId is undefined. speakerUuid: ${uuid}`);
-    characters.set(speakerName, styleId);
+    if (style == undefined)
+      throw new Error(`style is undefined. speakerUuid: ${uuid}`);
+    characters.set(speakerName, {
+      engineId: style.engineId,
+      styleId: style.styleId,
+    });
   }
   // setup characters with style name
   for (const characterInfo of userOrderedCharacterInfos) {
     for (const style of characterInfo.metas.styles) {
       characters.set(
         `${characterInfo.metas.speakerName}(${style.styleName || "ノーマル"})`,
-        style.styleId
+        { engineId: style.engineId, styleId: style.styleId }
       );
     }
   }
@@ -101,19 +113,22 @@ function parseTextFile(
 
   const audioItems: AudioItem[] = [];
   const seps = [",", "\r\n", "\n"];
-  let lastStyleId = uuid2StyleIds.get(
+  let lastStyle = uuid2StyleIds.get(
     userOrderedCharacterInfos[0].metas.speakerUuid
   );
-  if (lastStyleId == undefined) throw new Error(`lastStyleId is undefined.`);
+  if (lastStyle == undefined) throw new Error(`lastStyle is undefined.`);
   for (const splitText of body.split(new RegExp(`${seps.join("|")}`, "g"))) {
     const styleId = characters.get(splitText);
     if (styleId !== undefined) {
-      lastStyleId = styleId;
+      lastStyle = styleId;
       continue;
     }
 
-    // FIXME: engineIdの追加
-    audioItems.push({ text: splitText, styleId: lastStyleId });
+    audioItems.push({
+      text: splitText,
+      engineId: lastStyle.engineId,
+      styleId: lastStyle.styleId,
+    });
   }
   return audioItems;
 }
@@ -190,6 +205,7 @@ const audioElements: Record<string, HTMLAudioElement> = {};
 
 export const audioStoreState: AudioStoreState = {
   characterInfos: {},
+  morphableTargetsInfo: {},
   audioItems: {},
   audioKeys: [],
   audioStates: {},
@@ -261,6 +277,8 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
             styleId: style.id,
             engineId,
             iconPath: base64ImageToUri(styleInfo.icon),
+            portraitPath:
+              styleInfo.portrait && base64ImageToUri(styleInfo.portrait),
             voiceSamplePaths: voiceSamples,
           };
         });
@@ -285,7 +303,7 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
           metas: {
             speakerUuid: speaker.speakerUuid,
             speakerName: speaker.name,
-            styles: styles,
+            styles,
             policy: speakerInfo.policy,
           },
         };
@@ -310,6 +328,58 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
       }: { engineId: string; characterInfos: CharacterInfo[] }
     ) {
       state.characterInfos[engineId] = characterInfos;
+    },
+  },
+
+  LOAD_MORPHABLE_TARGETS: {
+    async action({ state, dispatch, commit }, { engineId, baseStyleId }) {
+      if (!state.engineManifests[engineId].supportedFeatures?.synthesisMorphing)
+        return;
+
+      if (state.morphableTargetsInfo[engineId]?.[baseStyleId]) return;
+
+      const rawMorphableTargets = (
+        await (
+          await dispatch("INSTANTIATE_ENGINE_CONNECTOR", { engineId })
+        ).invoke("morphableTargetsMorphableTargetsPost")({
+          requestBody: [baseStyleId],
+        })
+      )[0];
+
+      // FIXME: 何故かis_morphableがCamelCaseに変換されないので変換する必要がある
+      const morphableTargets = Object.fromEntries(
+        Object.entries(rawMorphableTargets).map(([key, value]) => {
+          const isMorphable = (value as unknown as { is_morphable: boolean })
+            .is_morphable;
+          if (isMorphable === undefined || typeof isMorphable !== "boolean") {
+            throw Error(
+              "The is_morphable property does not exist, it is either CamelCase or the engine type is wrong."
+            );
+          }
+          return [
+            parseInt(key),
+            {
+              ...value,
+              isMorphable,
+            },
+          ];
+        })
+      );
+
+      commit("SET_MORPHABLE_TARGETS", {
+        engineId,
+        baseStyleId,
+        morphableTargets,
+      });
+    },
+  },
+
+  SET_MORPHABLE_TARGETS: {
+    mutation(state, { engineId, baseStyleId, morphableTargets }) {
+      if (!state.morphableTargetsInfo[engineId]) {
+        state.morphableTargetsInfo[engineId] = {};
+      }
+      state.morphableTargetsInfo[engineId][baseStyleId] = morphableTargets;
     },
   },
 
@@ -508,6 +578,7 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
         audioItem.query.outputSamplingRate =
           baseAudioItem.query.outputSamplingRate;
         audioItem.query.outputStereo = baseAudioItem.query.outputStereo;
+        audioItem.morphingInfo = baseAudioItem.morphingInfo;
       }
       return audioItem;
     },
@@ -699,6 +770,44 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
       const query = state.audioItems[audioKey].query;
       if (query == undefined) throw new Error("query == undefined");
       query.postPhonemeLength = postPhonemeLength;
+    },
+  },
+
+  SET_MORPHING_INFO: {
+    mutation(
+      state,
+      {
+        audioKey,
+        morphingInfo,
+      }: { audioKey: string; morphingInfo: MorphingInfo | undefined }
+    ) {
+      const item = state.audioItems[audioKey];
+      item.morphingInfo = morphingInfo;
+    },
+  },
+
+  MORPHING_SUPPORTED_ENGINES: {
+    getter: (state) =>
+      state.engineIds.filter(
+        (engineId) =>
+          state.engineManifests[engineId].supportedFeatures?.synthesisMorphing
+      ),
+  },
+
+  VALID_MORPHING_INFO: {
+    getter: (state) => (audioItem: AudioItem) => {
+      if (
+        audioItem.engineId == undefined ||
+        audioItem.styleId == undefined ||
+        audioItem.morphingInfo?.targetStyleId == undefined
+      )
+        return false;
+      const info =
+        state.morphableTargetsInfo[audioItem.engineId]?.[audioItem.styleId]?.[
+          audioItem.morphingInfo.targetStyleId
+        ];
+      if (info == undefined) return false;
+      return info.isMorphable;
     },
   },
 
@@ -894,7 +1003,7 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
       if (presetItem == undefined) return;
 
       // Filter name property from presetItem in order to extract audioInfos.
-      const { name: _, ...presetAudioInfos } = presetItem;
+      const { name: _, morphingInfo, ...presetAudioInfos } = presetItem;
 
       // Type Assertion
       const audioInfos: Omit<
@@ -903,6 +1012,8 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
       > = presetAudioInfos;
 
       audioItem.query = { ...audioItem.query, ...audioInfos };
+
+      audioItem.morphingInfo = morphingInfo;
     },
   },
 
@@ -1067,42 +1178,57 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
 
   GENERATE_AUDIO_FROM_AUDIO_ITEM: {
     action: createUILockAction(
-      async ({ dispatch, state }, { audioItem }: { audioItem: AudioItem }) => {
+      async (
+        { dispatch, getters, state },
+        { audioItem }: { audioItem: AudioItem }
+      ) => {
         const engineId = audioItem.engineId;
         if (engineId === undefined)
-          throw new Error(`engineId is not defined for audioItem`);
+          throw new Error("engineId is not defined for audioItem");
 
         const [id, audioQuery] = await generateUniqueIdAndQuery(
           state,
           audioItem
         );
+        if (audioQuery == undefined)
+          throw new Error("audioQuery is not defined for audioItem");
+
         const speaker = audioItem.styleId;
-        if (audioQuery == undefined || speaker == undefined) {
-          return null;
-        }
+        if (speaker == undefined)
+          throw new Error("speaker is not defined for audioItem");
+
+        const engineAudioQuery = convertAudioQueryFromEditorToEngine(
+          audioQuery,
+          state.engineManifests[engineId].defaultSamplingRate
+        );
 
         return dispatch("INSTANTIATE_ENGINE_CONNECTOR", {
           engineId,
-        })
-          .then((instance) =>
-            instance.invoke("synthesisSynthesisPost")({
-              audioQuery: convertAudioQueryFromEditorToEngine(
-                audioQuery,
-                state.engineManifests[engineId].defaultSamplingRate
-              ),
+        }).then(async (instance) => {
+          let blob: Blob;
+          // FIXME: モーフィングが設定で無効化されていてもモーフィングが行われるので気づけるUIを作成する
+          if (audioItem.morphingInfo != undefined) {
+            if (!getters.VALID_MORPHING_INFO(audioItem))
+              throw new Error("VALID_MORPHING_ERROR"); //FIXME: エラーを変更した場合ハンドリング部分も修正する
+            blob = await instance.invoke(
+              "synthesisMorphingSynthesisMorphingPost"
+            )({
+              audioQuery: engineAudioQuery,
+              baseSpeaker: speaker,
+              targetSpeaker: audioItem.morphingInfo.targetStyleId,
+              morphRate: audioItem.morphingInfo.rate,
+            });
+          } else {
+            blob = await instance.invoke("synthesisSynthesisPost")({
+              audioQuery: engineAudioQuery,
               speaker,
               enableInterrogativeUpspeak:
                 state.experimentalSetting.enableInterrogativeUpspeak,
-            })
-          )
-          .then(async (blob) => {
-            audioBlobCache[id] = blob;
-            return blob;
-          })
-          .catch((e) => {
-            window.electron.logError(e);
-            return null;
-          });
+            });
+          }
+          audioBlobCache[id] = blob;
+          return blob;
+        });
       }
     ),
   },
@@ -1177,9 +1303,21 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
 
         let blob = await dispatch("GET_AUDIO_CACHE", { audioKey });
         if (!blob) {
-          blob = await dispatch("GENERATE_AUDIO", { audioKey });
-          if (!blob) {
-            return { result: "ENGINE_ERROR", path: filePath };
+          try {
+            blob = await dispatch("GENERATE_AUDIO", { audioKey });
+          } catch (e) {
+            let errorMessage = undefined;
+            // FIXME: GENERATE_AUDIO_FROM_AUDIO_ITEMのエラーを変えた場合変更する
+            if (e instanceof Error && e.message === "VALID_MORPHING_ERROR") {
+              errorMessage = "モーフィングの設定が無効です。";
+            } else {
+              window.electron.logError(e);
+            }
+            return {
+              result: "ENGINE_ERROR",
+              path: filePath,
+              errorMessage,
+            };
           }
         }
 
@@ -1374,11 +1512,24 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
         for (const audioKey of state.audioKeys) {
           let blob = await dispatch("GET_AUDIO_CACHE", { audioKey });
           if (!blob) {
-            blob = await dispatch("GENERATE_AUDIO", { audioKey });
-            callback?.(++finishedCount, totalCount);
-          }
-          if (blob === null) {
-            return { result: "ENGINE_ERROR", path: filePath };
+            try {
+              blob = await dispatch("GENERATE_AUDIO", { audioKey });
+            } catch (e) {
+              let errorMessage = undefined;
+              // FIXME: GENERATE_AUDIO_FROM_AUDIO_ITEMのエラーを変えた場合変更する
+              if (e instanceof Error && e.message === "VALID_MORPHING_ERROR") {
+                errorMessage = "モーフィングの設定が無効です。";
+              } else {
+                window.electron.logError(e);
+              }
+              return {
+                result: "ENGINE_ERROR",
+                path: filePath,
+                errorMessage,
+              };
+            } finally {
+              callback?.(++finishedCount, totalCount);
+            }
           }
           const encodedBlob = await base64Encoder(blob);
           if (encodedBlob === undefined) {
@@ -1580,16 +1731,16 @@ export const audioStore = createPartialStore<AudioStoreTypes>({
             audioKey,
             nowGenerating: true,
           });
-          blob = await withProgress(
-            dispatch("GENERATE_AUDIO", { audioKey }),
-            dispatch
-          );
-          commit("SET_AUDIO_NOW_GENERATING", {
-            audioKey,
-            nowGenerating: false,
-          });
-          if (!blob) {
-            throw new Error();
+          try {
+            blob = await withProgress(
+              dispatch("GENERATE_AUDIO", { audioKey }),
+              dispatch
+            );
+          } finally {
+            commit("SET_AUDIO_NOW_GENERATING", {
+              audioKey,
+              nowGenerating: false,
+            });
           }
         }
 
@@ -1762,25 +1913,34 @@ export const audioCommandStore = transformCommandStore(
           audioItem: AudioItem;
           audioKey: string;
           prevAudioKey: string | undefined;
+          applyPreset: boolean;
         }
       ) {
         audioStore.mutations.INSERT_AUDIO_ITEM(draft, payload);
-        audioStore.mutations.APPLY_AUDIO_PRESET(draft, {
-          audioKey: payload.audioKey,
-        });
+        if (payload.applyPreset) {
+          audioStore.mutations.APPLY_AUDIO_PRESET(draft, {
+            audioKey: payload.audioKey,
+          });
+        }
       },
       async action(
         { dispatch, commit },
         {
           audioItem,
           prevAudioKey,
-        }: { audioItem: AudioItem; prevAudioKey: string | undefined }
+          applyPreset,
+        }: {
+          audioItem: AudioItem;
+          prevAudioKey: string | undefined;
+          applyPreset: boolean;
+        }
       ) {
         const audioKey = await dispatch("GENERATE_AUDIO_KEY");
         commit("COMMAND_REGISTER_AUDIO_ITEM", {
           audioItem,
           audioKey,
           prevAudioKey,
+          applyPreset,
         });
         return audioKey;
       },
@@ -2522,6 +2682,27 @@ export const audioCommandStore = transformCommandStore(
         payload: { audioKey: string; postPhonemeLength: number }
       ) {
         commit("COMMAND_SET_AUDIO_POST_PHONEME_LENGTH", payload);
+      },
+    },
+
+    COMMAND_SET_MORPHING_INFO: {
+      mutation(
+        draft,
+        payload: {
+          audioKey: string;
+          morphingInfo: MorphingInfo | undefined;
+        }
+      ) {
+        audioStore.mutations.SET_MORPHING_INFO(draft, payload);
+      },
+      action(
+        { commit },
+        payload: {
+          audioKey: string;
+          morphingInfo: MorphingInfo | undefined;
+        }
+      ) {
+        commit("COMMAND_SET_MORPHING_INFO", payload);
       },
     },
 

@@ -13,18 +13,11 @@ import {
   EngineInfo,
   ElectronStoreType,
   EngineDirValidationResult,
+  MinimumEngineManifest,
 } from "@/type/preload";
 
 import log from "electron-log";
-import Ajv from "ajv/dist/jtd";
-
-type MinimumEngineManifest = {
-  name: string;
-  uuid: string;
-  command: string;
-  port: string;
-  icon: string;
-};
+import { z } from "zod";
 
 type EngineProcessContainer = {
   willQuitEngine: boolean;
@@ -38,28 +31,18 @@ function createDefaultEngineInfos(defaultEngineDir: string): EngineInfo[] {
   // TODO: envから直接ではなく、envに書いたengine_manifest.jsonから情報を得るようにする
   const defaultEngineInfosEnv = process.env.DEFAULT_ENGINE_INFOS ?? "[]";
 
-  const envSchema = {
-    elements: {
-      properties: {
-        uuid: { type: "string" },
-        host: { type: "string" },
-        name: { type: "string" },
-        executionEnabled: { type: "boolean" },
-        executionFilePath: { type: "string" },
-        executionArgs: { elements: { type: "string" } },
-      },
-      optionalProperties: {
-        path: { type: "string" },
-      },
-    },
-  } as const;
-  const ajv = new Ajv();
-  const validate = ajv.compile(envSchema);
-
-  const engines = JSON.parse(defaultEngineInfosEnv);
-  if (!validate(engines)) {
-    throw validate.errors;
-  }
+  const envSchema = z
+    .object({
+      uuid: z.string().uuid(),
+      host: z.string(),
+      name: z.string(),
+      executionEnabled: z.boolean(),
+      executionFilePath: z.string(),
+      executionArgs: z.array(z.string()),
+      path: z.string().optional(),
+    })
+    .array();
+  const engines = envSchema.parse(JSON.parse(defaultEngineInfosEnv));
 
   return engines.map((engineInfo) => {
     return {
@@ -100,7 +83,7 @@ export class EngineManager {
 
   /**
    * 追加エンジンの一覧を取得する。
-   * FIXME: store.get("engineDirs")への副作用をEngineManager外に移動する
+   * FIXME: store.get("registeredEngineDirs")への副作用をEngineManager外に移動する
    */
   fetchAdditionalEngineInfos(): EngineInfo[] {
     const engines: EngineInfo[] = [];
@@ -146,8 +129,8 @@ export class EngineManager {
         log.log(`Failed to load engine: ${result}, ${engineDir}`);
       }
     }
-    // FIXME: この関数の引数でengineDirsを受け取り、動かないエンジンをreturnして、EngineManager外でstore.setする
-    for (const engineDir of this.store.get("engineDirs")) {
+    // FIXME: この関数の引数でregisteredEngineDirsを受け取り、動かないエンジンをreturnして、EngineManager外でstore.setする
+    for (const engineDir of this.store.get("registeredEngineDirs")) {
       const result = addEngine(engineDir, "path");
       if (result !== "ok") {
         log.log(`Failed to load engine: ${result}, ${engineDir}`);
@@ -158,8 +141,8 @@ export class EngineManager {
           `${engineDir}を読み込めませんでした。このエンジンは削除されます。`
         );
         this.store.set(
-          "engineDirs",
-          this.store.get("engineDirs").filter((p) => p !== engineDir)
+          "registeredEngineDirs",
+          this.store.get("registeredEngineDirs").filter((p) => p !== engineDir)
         );
       }
     }
@@ -250,8 +233,7 @@ export class EngineManager {
     const engineProcessContainer = this.engineProcessContainers[engineId];
     engineProcessContainer.willQuitEngine = false;
 
-    const useGpu = this.store.get("useGpu");
-
+    const useGpu = this.store.get("engineSettings")[engineId].useGpu;
     log.info(`ENGINE ${engineId} mode: ${useGpu ? "GPU" : "CPU"}`);
 
     // エンジンプロセスの起動
@@ -295,7 +277,7 @@ export class EngineManager {
         const dialogMessage =
           engineInfos.length === 1
             ? "音声合成エンジンが異常終了しました。エンジンを再起動してください。"
-            : `${engineInfo.name}の音声合成エンジンが異常終了しました。エンジンを再起動してください。`;
+            : `${engineInfo.name}が異常終了しました。エンジンを再起動してください。`;
         dialog.showErrorBox("音声合成エンジンエラー", dialogMessage);
       }
     });
@@ -376,17 +358,6 @@ export class EngineManager {
         reject(error);
       }
     });
-  }
-
-  /**
-   * 全てのエンジンを再起動する。
-   * FIXME: winを受け取らなくても良いようにする
-   */
-  async restartEngineAll(win: BrowserWindow) {
-    const engineInfos = this.fetchEngineInfos();
-    for (const engineInfo of engineInfos) {
-      await this.restartEngine(engineInfo.uuid, win);
-    }
   }
 
   /**

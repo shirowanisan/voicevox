@@ -182,10 +182,17 @@ const api: Sandbox = {
   },
 
   logError: (...params) => {
+    console.error(...params);
     return ipcRenderer.invoke("LOG_ERROR", ...params);
   },
 
+  logWarn: (...params) => {
+    console.warn(...params);
+    return ipcRenderer.invoke("LOG_WARN", ...params);
+  },
+
   logInfo: (...params) => {
+    console.info(...params);
     return ipcRenderer.invoke("LOG_INFO", ...params);
   },
 
@@ -195,10 +202,6 @@ const api: Sandbox = {
 
   appDirPath: () => {
     return ipcRendererInvoke("APP_DIR_PATH");
-  },
-
-  restartEngineAll: () => {
-    return ipcRendererInvoke("RESTART_ENGINE_ALL");
   },
 
   restartEngine: (engineId: string) => {
@@ -227,6 +230,10 @@ const api: Sandbox = {
 
   getDefaultToolbarSetting: async () => {
     return await ipcRendererInvoke("GET_DEFAULT_TOOLBAR_SETTING");
+  },
+
+  setNativeTheme: (source) => {
+    ipcRenderer.invoke("SET_NATIVE_THEME", source);
   },
 
   theme: (newData) => {
@@ -258,6 +265,14 @@ const api: Sandbox = {
     )) as typeof newValue;
   },
 
+  setEngineSetting: async (engineId, engineSetting) => {
+    return await ipcRendererInvoke(
+      "SET_ENGINE_SETTING",
+      engineId,
+      engineSetting
+    );
+  },
+
   installVvppEngine: async (filePath) => {
     return await ipcRendererInvoke("INSTALL_VVPP_ENGINE", filePath);
   },
@@ -270,8 +285,8 @@ const api: Sandbox = {
     return await ipcRendererInvoke("VALIDATE_ENGINE_DIR", { engineDir });
   },
 
-  restartApp: ({ isSafeMode }: { isSafeMode: boolean }) => {
-    ipcRendererInvoke("RESTART_APP", { isSafeMode });
+  restartApp: ({ isMultiEngineOffMode }: { isMultiEngineOffMode: boolean }) => {
+    ipcRendererInvoke("RESTART_APP", { isMultiEngineOffMode });
   },
 };
 

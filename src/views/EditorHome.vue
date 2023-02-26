@@ -28,10 +28,10 @@
               エンジン起動に時間がかかっています。<br />
               <q-btn
                 outline
-                @click="restartAppWithSafeMode"
+                @click="restartAppWithMultiEngineOffMode"
                 v-if="isMultipleEngine"
               >
-                セーフモードで起動する</q-btn
+                マルチエンジンをオフにして再起動する</q-btn
               >
               <q-btn outline @click="openFaq" v-else>FAQを見る</q-btn>
             </template>
@@ -190,7 +190,7 @@ import SettingDialog from "@/components/SettingDialog.vue";
 import HotkeySettingDialog from "@/components/HotkeySettingDialog.vue";
 import HeaderBarCustomDialog from "@/components/HeaderBarCustomDialog.vue";
 import CharacterPortrait from "@/components/CharacterPortrait.vue";
-import DefaultStyleSelectDialog from "@/components/DefaultStyleSelectDialog.vue";
+import DefaultStyleListDialog from "@/components/DefaultStyleListDialog.vue";
 import CharacterOrderDialog from "@/components/CharacterOrderDialog.vue";
 import CharacterDownloadDialog from "@/components/CharacterDownloadDialog.vue";
 import AcceptRetrieveTelemetryDialog from "@/components/AcceptRetrieveTelemetryDialog.vue";
@@ -207,6 +207,7 @@ import {
   SplitterPosition,
 } from "@/type/preload";
 import { parseCombo, setHotkeyFunctions } from "@/store/setting";
+import cloneDeep from "clone-deep";
 
 export default defineComponent({
   name: "EditorHome",
@@ -223,7 +224,7 @@ export default defineComponent({
     HotkeySettingDialog,
     HeaderBarCustomDialog,
     CharacterPortrait,
-    DefaultStyleSelectDialog,
+    DefaultStyleListDialog,
     CharacterOrderDialog,
     CharacterDownloadDialog,
     AcceptRetrieveTelemetryDialog,
@@ -252,6 +253,17 @@ export default defineComponent({
             focusCell({ audioKey: activeAudioKey.value });
           }
           return false; // this is the same with event.preventDefault()
+        },
+      ],
+      [
+        // FIXME: テキスト欄にフォーカスがある状態でも実行できるようにする
+        // https://github.com/VOICEVOX/voicevox/pull/1096#issuecomment-1378651920
+        "テキスト欄を複製",
+        () => {
+          if (activeAudioKey.value != undefined) {
+            duplicateAudioItem();
+          }
+          return false;
         },
       ],
     ]);
@@ -423,6 +435,22 @@ export default defineComponent({
       const newAudioKey = await store.dispatch("COMMAND_REGISTER_AUDIO_ITEM", {
         audioItem,
         prevAudioKey: activeAudioKey.value,
+        applyPreset: true,
+      });
+      audioCellRefs[newAudioKey].focusTextField();
+    };
+    const duplicateAudioItem = async () => {
+      const prevAudioKey = activeAudioKey.value;
+
+      // audioItemが選択されていない状態で押されたら何もしない
+      if (prevAudioKey == undefined) return;
+
+      const prevAudioItem = store.state.audioItems[prevAudioKey];
+
+      const newAudioKey = await store.dispatch("COMMAND_REGISTER_AUDIO_ITEM", {
+        audioItem: cloneDeep(prevAudioItem),
+        prevAudioKey: activeAudioKey.value,
+        applyPreset: false,
       });
       audioCellRefs[newAudioKey].focusTextField();
     };
@@ -499,7 +527,7 @@ export default defineComponent({
       await store.dispatch("GET_ENGINE_INFOS");
 
       let engineIds: string[];
-      if (store.state.isSafeMode) {
+      if (store.state.isMultiEngineOffMode) {
         // デフォルトエンジンだけを含める
         const main = Object.values(store.state.engineInfos).find(
           (engine) => engine.type === "default"
@@ -511,25 +539,14 @@ export default defineComponent({
       } else {
         engineIds = store.state.engineIds;
       }
-      await Promise.all(
-        engineIds.map(async (engineId) => {
-          await store.dispatch("START_WAITING_ENGINE", { engineId });
-
-          await store.dispatch("FETCH_AND_SET_ENGINE_MANIFEST", { engineId });
-
-          await store.dispatch("LOAD_CHARACTER", { engineId });
-        })
-      );
       await store.dispatch("LOAD_DOWNLOAD_INFOS");
       await store.dispatch("LOAD_USER_CHARACTER_ORDER");
-      await store.dispatch("LOAD_DEFAULT_STYLE_IDS");
+      await store.dispatch("POST_ENGINE_START", {
+        engineIds,
+      });
 
       // 辞書を同期
       await store.dispatch("SYNC_ALL_USER_DICT");
-
-      // 新キャラが追加されている場合はキャラ並び替えダイアログを表示
-      const newCharacters = await store.dispatch("GET_NEW_CHARACTERS");
-      isCharacterOrderDialogOpenComputed.value = newCharacters.length > 0;
 
       // 最初のAudioCellを作成
       const audioItem: AudioItem = await store.dispatch(
@@ -602,13 +619,13 @@ export default defineComponent({
         isEngineWaitingLong.value = false;
         engineTimer = window.setTimeout(() => {
           isEngineWaitingLong.value = true;
-        }, 60000);
+        }, 30000);
       } else {
         isEngineWaitingLong.value = false;
       }
     });
-    const restartAppWithSafeMode = () => {
-      store.dispatch("RESTART_APP", { isSafeMode: true });
+    const restartAppWithMultiEngineOffMode = () => {
+      store.dispatch("RESTART_APP", { isMultiEngineOffMode: true });
     };
 
     const openFaq = () => {
@@ -779,7 +796,7 @@ export default defineComponent({
       allEngineState,
       isEngineWaitingLong,
       isMultipleEngine,
-      restartAppWithSafeMode,
+      restartAppWithMultiEngineOffMode,
       openFaq,
       isHelpDialogOpenComputed,
       isSettingDialogOpenComputed,
