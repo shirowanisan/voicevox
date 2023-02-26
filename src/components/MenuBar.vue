@@ -98,7 +98,7 @@ const titleText = computed(
   () =>
     (isEdited.value ? "*" : "") +
     (projectName.value !== undefined ? projectName.value + " - " : "") +
-    "VOICEVOX" +
+    "COEIROINK" +
     (currentVersion.value ? " - Ver. " + currentVersion.value : "") +
     (isMultiEngineOffMode.value ? " - マルチエンジンオフ" : "")
 );
@@ -207,6 +207,9 @@ const closeAllDialog = () => {
   });
   store.dispatch("SET_DIALOG_OPEN", {
     isCharacterOrderDialogOpen: false,
+  });
+  store.dispatch("SET_DIALOG_OPEN", {
+    isCharacterDownloadDialogOpen: false,
   });
   store.dispatch("SET_DIALOG_OPEN", {
     isDefaultStyleSelectDialogOpen: false,
@@ -345,6 +348,16 @@ const menudata = ref<MenuItemData[]>([
         onClick() {
           store.dispatch("SET_DIALOG_OPEN", {
             isCharacterOrderDialogOpen: true,
+          });
+        },
+        disableWhenUiLocked: true,
+      },
+      {
+        type: "button",
+        label: "キャラクターダウンロード",
+        onClick() {
+          store.dispatch("SET_DIALOG_OPEN", {
+            isCharacterDownloadDialogOpen: true,
           });
         },
         disableWhenUiLocked: true,

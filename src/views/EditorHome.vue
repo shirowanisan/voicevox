@@ -151,7 +151,12 @@
     :characterInfos="orderedAllCharacterInfos"
     v-model="isCharacterOrderDialogOpenComputed"
   />
-  <default-style-list-dialog
+  <character-download-dialog
+    v-if="downloadInfos"
+    :downloadInfos="downloadInfos"
+    v-model="isCharacterDownloadDialogOpenComputed"
+  />
+  <default-style-select-dialog
     v-if="orderedAllCharacterInfos.length > 0"
     :characterInfos="orderedAllCharacterInfos"
     v-model="isDefaultStyleSelectDialogOpenComputed"
@@ -187,6 +192,7 @@ import HeaderBarCustomDialog from "@/components/HeaderBarCustomDialog.vue";
 import CharacterPortrait from "@/components/CharacterPortrait.vue";
 import DefaultStyleListDialog from "@/components/DefaultStyleListDialog.vue";
 import CharacterOrderDialog from "@/components/CharacterOrderDialog.vue";
+import CharacterDownloadDialog from "@/components/CharacterDownloadDialog.vue";
 import AcceptRetrieveTelemetryDialog from "@/components/AcceptRetrieveTelemetryDialog.vue";
 import AcceptTermsDialog from "@/components/AcceptTermsDialog.vue";
 import DictionaryManageDialog from "@/components/DictionaryManageDialog.vue";
@@ -220,6 +226,7 @@ export default defineComponent({
     CharacterPortrait,
     DefaultStyleListDialog,
     CharacterOrderDialog,
+    CharacterDownloadDialog,
     AcceptRetrieveTelemetryDialog,
     AcceptTermsDialog,
     DictionaryManageDialog,
@@ -532,6 +539,7 @@ export default defineComponent({
       } else {
         engineIds = store.state.engineIds;
       }
+      await store.dispatch("LOAD_DOWNLOAD_INFOS");
       await store.dispatch("LOAD_USER_CHARACTER_ORDER");
       await store.dispatch("POST_ENGINE_START", {
         engineIds,
@@ -679,6 +687,18 @@ export default defineComponent({
         }),
     });
 
+    // キャラクターダウンロード
+    const downloadInfos = computed(() => store.state.downloadInfos);
+    const isCharacterDownloadDialogOpenComputed = computed({
+      get: () =>
+        !store.state.isAcceptTermsDialogOpen &&
+        store.state.isCharacterDownloadDialogOpen,
+      set: (val) =>
+        store.dispatch("SET_DIALOG_OPEN", {
+          isCharacterDownloadDialogOpen: val,
+        }),
+    });
+
     // デフォルトスタイル選択
     const isDefaultStyleSelectDialogOpenComputed = computed({
       get: () =>
@@ -730,14 +750,14 @@ export default defineComponent({
         case ".txt":
           store.dispatch("COMMAND_IMPORT_FROM_FILE", { filePath: file.path });
           break;
-        case ".vvproj":
+        case ".ciproj":
           store.dispatch("LOAD_PROJECT_FILE", { filePath: file.path });
           break;
         default:
           $q.dialog({
             title: "対応していないファイルです",
             message:
-              "テキストファイル (.txt) とVOICEVOXプロジェクトファイル (.vvproj) に対応しています。",
+              "テキストファイル (.txt) とCOEIROINKプロジェクトファイル (.ciproj) に対応しています。",
             ok: {
               label: "閉じる",
               flat: true,
@@ -784,6 +804,8 @@ export default defineComponent({
       isToolbarSettingDialogOpenComputed,
       orderedAllCharacterInfos,
       isCharacterOrderDialogOpenComputed,
+      downloadInfos,
+      isCharacterDownloadDialogOpenComputed,
       isDefaultStyleSelectDialogOpenComputed,
       isEngineManageDialogOpenComputed,
       isDictionaryManageDialogOpenComputed,

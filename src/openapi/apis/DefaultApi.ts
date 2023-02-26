@@ -54,6 +54,9 @@ import {
     WordTypes,
     WordTypesFromJSON,
     WordTypesToJSON,
+    DownloadInfo,
+    DownloadInfoFromJSON,
+    DownloadInfoToJSON,
 } from '../models';
 
 export interface AccentPhrasesAccentPhrasesPostRequest {
@@ -159,6 +162,10 @@ export interface RewriteUserDictWordUserDictWordWordUuidPutRequest {
     priority?: number;
 }
 
+export interface DownloadInfosDownloadInfosGetRequest {
+    coreVersion?: string;
+}
+
 export interface SettingPostSettingPostRequest {
     corsPolicyMode?: string;
     allowOrigin?: string;
@@ -225,7 +232,7 @@ export interface DefaultApiInterface {
     /**
      * 新しいプリセットを追加します  Parameters ------- preset: Preset     新しいプリセット。     プリセットIDが既存のものと重複している場合は、新規のプリセットIDが採番されます。  Returns ------- id: int     追加したプリセットのプリセットID
      * @summary Add Preset
-     * @param {Preset} preset 
+     * @param {Preset} preset
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -344,7 +351,7 @@ export interface DefaultApiInterface {
     /**
      * 既存のプリセットを削除します  Parameters ------- id: int     削除するプリセットのプリセットID
      * @summary Delete Preset
-     * @param {number} id 
+     * @param {number} id
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -454,7 +461,7 @@ export interface DefaultApiInterface {
      * @summary Initialize Speaker
      * @param {number} speaker 
      * @param {boolean} [skipReinit] 既に初期化済みの話者の再初期化をスキップするかどうか
-     * @param {string} [coreVersion] 
+     * @param {string} [coreVersion]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -538,8 +545,8 @@ export interface DefaultApiInterface {
     /**
      * 指定されたベース話者に対してエンジン内の各話者がモーフィング機能を利用可能か返します。 モーフィングの許可/禁止は`/speakers`の`speaker.supported_features.synthesis_morphing`に記載されています。 プロパティが存在しない場合は、モーフィングが許可されているとみなします。 返り値の話者はstring型なので注意。
      * @summary 指定した話者に対してエンジン内の話者がモーフィングが可能か判定する
-     * @param {Array<number>} requestBody 
-     * @param {string} [coreVersion] 
+     * @param {Array<number>} requestBody
+     * @param {string} [coreVersion]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -591,7 +598,7 @@ export interface DefaultApiInterface {
     rewriteUserDictWordUserDictWordWordUuidPut(requestParameters: RewriteUserDictWordUserDictWordWordUuidPutRequest, initOverrides?: RequestInit): Promise<void>;
 
     /**
-     * 
+     *
      * @summary Setting Get
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -605,10 +612,10 @@ export interface DefaultApiInterface {
     settingGetSettingGet(initOverrides?: RequestInit): Promise<string>;
 
     /**
-     * 
+     *
      * @summary Setting Post
-     * @param {string} [corsPolicyMode] 
-     * @param {string} [allowOrigin] 
+     * @param {string} [corsPolicyMode]
+     * @param {string} [allowOrigin]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -651,6 +658,21 @@ export interface DefaultApiInterface {
      * Speakers
      */
     speakersSpeakersGet(requestParameters: SpeakersSpeakersGetRequest, initOverrides?: RequestInit): Promise<Array<Speaker>>;
+
+    /**
+     *
+     * @summary DownloadInfos
+     * @param {string} [coreVersion]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    downloadInfosDownloadInfosGetRaw(requestParameters: DownloadInfosDownloadInfosGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Array<DownloadInfo>>>;
+
+    /**
+     * Download Info
+     */
+    downloadInfosDownloadInfosGet(requestParameters: DownloadInfosDownloadInfosGetRequest, initOverrides?: RequestInit): Promise<Array<DownloadInfo>>;
 
     /**
      * 
@@ -708,7 +730,7 @@ export interface DefaultApiInterface {
     /**
      * 既存のプリセットを更新します  Parameters ------- preset: Preset     更新するプリセット。     プリセットIDが更新対象と一致している必要があります。  Returns ------- id: int     更新したプリセットのプリセットID
      * @summary Update Preset
-     * @param {Preset} preset 
+     * @param {Preset} preset
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -1816,6 +1838,37 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      */
     async speakersSpeakersGet(requestParameters: SpeakersSpeakersGetRequest, initOverrides?: RequestInit): Promise<Array<Speaker>> {
         const response = await this.speakersSpeakersGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * ダウンロード可能な話者情報をjson形式で返します。 画像や音声はbase64エンコードされたものが返されます。  Returns ------- ret_data: DownloadInfo
+     * Download Info
+     */
+    async downloadInfosDownloadInfosGetRaw(requestParameters: DownloadInfosDownloadInfosGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Array<DownloadInfo>>> {
+       const queryParameters: any = {};
+
+        if (requestParameters.coreVersion !== undefined) {
+            queryParameters['core_version'] = requestParameters.coreVersion;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/download_infos`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(DownloadInfoFromJSON));
+    }
+
+    /**
+     * Download Info
+     */
+    async downloadInfosDownloadInfosGet(requestParameters: DownloadInfosDownloadInfosGetRequest, initOverrides?: RequestInit): Promise<Array<DownloadInfo>> {
+        const response = await this.downloadInfosDownloadInfosGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

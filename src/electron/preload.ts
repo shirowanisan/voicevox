@@ -141,8 +141,16 @@ const api: Sandbox = {
     return await ipcRendererInvoke("WRITE_FILE", { filePath, buffer });
   },
 
+  writeSpeakerFile: async ({ filePath, buffer }) => {
+    return await ipcRendererInvoke("WRITE_SPEAKER_FILE", { filePath, buffer });
+  },
+
   readFile: async ({ filePath }) => {
     return await ipcRendererInvoke("READ_FILE", { filePath });
+  },
+
+  removeFile: async ({ filePath }) => {
+    return await ipcRendererInvoke("REMOVE_FILE", { filePath });
   },
 
   openTextEditContextMenu: () => {
@@ -190,6 +198,10 @@ const api: Sandbox = {
 
   engineInfos: () => {
     return ipcRendererInvoke("ENGINE_INFOS");
+  },
+
+  appDirPath: () => {
+    return ipcRendererInvoke("APP_DIR_PATH");
   },
 
   restartEngine: (engineId: string) => {

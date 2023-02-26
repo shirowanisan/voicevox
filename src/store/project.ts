@@ -7,7 +7,7 @@ import { createPartialStore } from "./vuex";
 import { AccentPhrase } from "@/openapi";
 import { z } from "zod";
 
-const DEFAULT_SAMPLING_RATE = 24000;
+const DEFAULT_SAMPLING_RATE = 44100;
 
 export const projectStoreState: ProjectStoreState = {
   savedLastCommandUnixMillisec: null,
@@ -80,7 +80,7 @@ export const projectStore = createPartialStore<ProjectStoreTypes>({
           filePath = ret[0];
         }
 
-        const projectFileErrorMsg = `VOICEVOX Project file "${filePath}" is a invalid file.`;
+        const projectFileErrorMsg = `COEIROINK Project file "${filePath}" is a invalid file.`;
 
         try {
           const buf = await window.electron.readFile({ filePath });
@@ -321,7 +321,7 @@ export const projectStore = createPartialStore<ProjectStoreTypes>({
 
           if (!filePath) {
             // if new project: use generated name
-            defaultPath = buildProjectFileName(context.state, "vvproj");
+            defaultPath = buildProjectFileName(context.state, "ciproj");
           } else {
             // if saveAs for existing project: use current project path
             defaultPath = filePath;

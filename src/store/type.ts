@@ -13,6 +13,7 @@ import {
   EngineManifest,
   SupportedDevicesInfo,
   UserDictWord,
+  DownloadInfo,
   MorphableTargetInfo,
 } from "@/openapi";
 import { createCommandMutationTree, PayloadRecipeTree } from "./command";
@@ -153,6 +154,14 @@ export type AudioStoreTypes = {
 
   USER_ORDERED_CHARACTER_INFOS: {
     getter: CharacterInfo[] | undefined;
+  };
+
+  LOAD_DOWNLOAD_INFOS: {
+    action(): void;
+  };
+
+  SET_DOWNLOAD_INFOS: {
+    mutation: { downloadInfos: DownloadInfo[] };
   };
 
   GENERATE_AUDIO_KEY: {
@@ -1065,6 +1074,7 @@ export type UiStoreState = {
   isHelpDialogOpen: boolean;
   isSettingDialogOpen: boolean;
   isCharacterOrderDialogOpen: boolean;
+  isCharacterDownloadDialogOpen: boolean;
   isDefaultStyleSelectDialogOpen: boolean;
   isHotkeySettingDialogOpen: boolean;
   isToolbarSettingDialogOpen: boolean;
@@ -1130,6 +1140,7 @@ export type UiStoreTypes = {
       isHotkeySettingDialogOpen?: boolean;
       isToolbarSettingDialogOpen?: boolean;
       isCharacterOrderDialogOpen?: boolean;
+      isCharacterDownloadDialogOpen?: boolean;
       isEngineManageDialogOpen?: boolean;
     };
     action(payload: {
@@ -1142,6 +1153,7 @@ export type UiStoreTypes = {
       isHotkeySettingDialogOpen?: boolean;
       isToolbarSettingDialogOpen?: boolean;
       isCharacterOrderDialogOpen?: boolean;
+      isCharacterDownloadDialogOpen?: boolean;
       isEngineManageDialogOpen?: boolean;
     }): void;
   };

@@ -622,7 +622,7 @@ ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", async (_, { title, defaultPath }) => {
   const result = await dialog.showSaveDialog(win, {
     title,
     defaultPath,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [{ name: "COEIROINK Project file", extensions: ["ciproj"] }],
     properties: ["showOverwriteConfirmation"],
   });
   if (result.canceled) {
@@ -634,7 +634,7 @@ ipcMainHandle("SHOW_PROJECT_SAVE_DIALOG", async (_, { title, defaultPath }) => {
 ipcMainHandle("SHOW_PROJECT_LOAD_DIALOG", async (_, { title }) => {
   const result = await dialog.showOpenDialog(win, {
     title,
-    filters: [{ name: "VOICEVOX Project file", extensions: ["vvproj"] }],
+    filters: [{ name: "COEIROINK Project file", extensions: ["ciproj"] }],
     properties: ["openFile", "createDirectory", "treatPackageAsDirectory"],
   });
   if (result.canceled) {
@@ -733,6 +733,10 @@ ipcMainHandle("LOG_INFO", (_, ...params) => {
 ipcMainHandle("ENGINE_INFOS", () => {
   // エンジン情報を設定ファイルに保存しないためにstoreは使わない
   return engineManager.fetchEngineInfos();
+});
+
+ipcMainHandle("APP_DIR_PATH", () => {
+  return appDirPath;
 });
 
 /**
@@ -846,12 +850,33 @@ ipcMainHandle("WRITE_FILE", (_, { filePath, buffer }) => {
   return undefined;
 });
 
+ipcMainHandle("WRITE_SPEAKER_FILE", (_, { filePath, buffer }) => {
+  try {
+    // throwだと`.code`の情報が消えるのでreturn
+    if (buffer.byteLength === 0) {
+      fs.mkdirSync(filePath, { recursive: true });
+    } else {
+      fs.writeFileSync(filePath, new DataView(buffer));
+    }
+  } catch (e) {
+    const a = e as SystemError;
+    return { code: a.code, message: a.message };
+  }
+
+  return undefined;
+});
+
 ipcMainHandle("JOIN_PATH", (_, { pathArray }) => {
   return path.join(...pathArray);
 });
 
 ipcMainHandle("READ_FILE", (_, { filePath }) => {
   return fs.promises.readFile(filePath);
+});
+
+ipcMainHandle("REMOVE_FILE", (_, { filePath }) => {
+  fs.rmSync(filePath, { recursive: true, force: true });
+  return undefined;
 });
 
 // app callback
