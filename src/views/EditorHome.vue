@@ -156,7 +156,7 @@
     :downloadInfos="downloadInfos"
     v-model="isCharacterDownloadDialogOpenComputed"
   />
-  <default-style-select-dialog
+  <default-style-list-dialog
     v-if="orderedAllCharacterInfos.length > 0"
     :characterInfos="orderedAllCharacterInfos"
     v-model="isDefaultStyleSelectDialogOpenComputed"
@@ -539,11 +539,11 @@ export default defineComponent({
       } else {
         engineIds = store.state.engineIds;
       }
-      await store.dispatch("LOAD_DOWNLOAD_INFOS");
       await store.dispatch("LOAD_USER_CHARACTER_ORDER");
       await store.dispatch("POST_ENGINE_START", {
         engineIds,
       });
+      await store.dispatch("LOAD_DOWNLOAD_INFOS");
 
       // 辞書を同期
       await store.dispatch("SYNC_ALL_USER_DICT");

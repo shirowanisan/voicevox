@@ -313,6 +313,7 @@ export default defineComponent({
           styleName: style.name,
           styleId: style.id,
           iconPath: styleInfo.icon,
+          portraitPath: undefined,
           engineId: "",
           voiceSamplePaths: styleInfo.voiceSamples,
         };
@@ -391,6 +392,7 @@ export default defineComponent({
         styleId: speakersMap.value[speakerUuid].styles[styleIndex].id,
         iconPath:
           speakerInfosMap.value[speakerUuid].styleInfos[styleIndex].icon,
+        portraitPath: undefined,
         engineId: "",
         voiceSamplePaths:
           speakerInfosMap.value[speakerUuid].styleInfos[styleIndex]
