@@ -40,6 +40,17 @@
             <p class="q-ma-sm">
               インターネットに接続していない場合、アップデート情報が取得できないことがあります。
             </p>
+            <p class="q-ma-sm">
+              ダウンロードに失敗することがあります。詳細は
+              <a
+                href="https://coeiroink.com/q_and_a"
+                target="_blank"
+                rel="noopener"
+              >
+                COEIROINK-Q&A
+              </a>
+              をご覧ください
+            </p>
             <span class="text-h6 q-py-md">ダウンロード一覧</span>
             <div>
               <q-item

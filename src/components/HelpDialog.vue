@@ -223,11 +223,11 @@ export default defineComponent({
           name: "よくあるご質問",
           component: QAndA,
         },
-        {
-          type: "item",
-          name: "お問い合わせ",
-          component: ContactInfo,
-        },
+        // {
+        //   type: "item",
+        //   name: "お問い合わせ",
+        //   component: ContactInfo,
+        // },
       ] as PageData[];
       // エンジンが一つだけの場合は従来の表示のみ
       if (store.state.engineIds.length > 1) {

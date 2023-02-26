@@ -30,9 +30,6 @@
             <q-card flat class="setting-card">
               <q-card-actions>
                 <div class="text-h5">エンジン</div>
-                <div>
-                  （CORIROINKではここでの設定は関係なくダウンロード時の設定で動きます）
-                </div>
                 <template v-if="engineIds.length > 1">
                   <q-space />
                   <q-select
@@ -644,7 +641,7 @@
                 </q-toggle>
               </q-card-actions>
               <q-card-actions class="q-px-md q-py-none bg-surface">
-                <div>モーフィング機能</div>
+                <div>モーフィング機能（COEIROINK非対応）</div>
                 <div>
                   <q-icon name="help_outline" size="sm" class="help-hover-icon">
                     <q-tooltip
