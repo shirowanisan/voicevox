@@ -45,7 +45,7 @@
               <a
                 href="https://coeiroink.com/q_and_a"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
               >
                 COEIROINK-Q&A
               </a>
