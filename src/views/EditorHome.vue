@@ -35,6 +35,11 @@
               >
               <q-btn outline @click="openFaq" v-else>FAQを見る</q-btn>
             </template>
+
+            <template v-if="isSpeakerInfoError">
+              <q-separator spaced />
+              speaker_infoの読み込みに失敗しました。<br />
+            </template>
           </div>
         </div>
         <q-splitter
@@ -523,6 +528,7 @@ export default defineComponent({
 
     // ソフトウェアを初期化
     const isCompletedInitialStartup = ref(false);
+    const isSpeakerInfoError = ref<boolean>(false);
     onMounted(async () => {
       await store.dispatch("GET_ENGINE_INFOS");
 
@@ -540,9 +546,14 @@ export default defineComponent({
         engineIds = store.state.engineIds;
       }
       await store.dispatch("LOAD_USER_CHARACTER_ORDER");
-      await store.dispatch("POST_ENGINE_START", {
-        engineIds,
-      });
+      try {
+        await store.dispatch("POST_ENGINE_START", {
+          engineIds,
+        });
+      } catch (e) {
+        isSpeakerInfoError.value = true;
+        throw e;
+      }
       await store.dispatch("LOAD_DOWNLOAD_INFOS");
 
       // 辞書を同期
@@ -796,6 +807,7 @@ export default defineComponent({
       allEngineState,
       isEngineWaitingLong,
       isMultipleEngine,
+      isSpeakerInfoError,
       restartAppWithMultiEngineOffMode,
       openFaq,
       isHelpDialogOpenComputed,
