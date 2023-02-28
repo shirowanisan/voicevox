@@ -54,7 +54,7 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 const beforeUserDataDir = app.getPath("userData"); // 設定ファイルのマイグレーション用
 const fixedUserDataDir = path.join(
   app.getPath("appData"),
-  `voicevox${isDevelopment ? "-dev" : ""}`
+  `coeiroink${isDevelopment ? "-dev" : ""}`
 );
 if (!fs.existsSync(fixedUserDataDir)) {
   fs.mkdirSync(fixedUserDataDir);
