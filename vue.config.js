@@ -4,7 +4,7 @@ const path = require("path");
 const process = require("process");
 
 const VOICEVOX_ENGINE_DIR =
-  process.env.VOICEVOX_ENGINE_DIR ?? "../voicevox_engine/run.dist/";
+  process.env.VOICEVOX_ENGINE_DIR ?? "../voicevox_engine/dist/run/";
 
 // ${productName} Web Setup ${version}.${ext}
 const NSIS_WEB_ARTIFACT_NAME = process.env.NSIS_WEB_ARTIFACT_NAME;
@@ -52,8 +52,8 @@ module.exports = {
           },
         ],
         extraFiles: [
-          { from: "build/README.txt", to: "README.txt" },
-          { from: ".env.production", to: ".env" },
+          { from: "build/README.txt", to: "./MacOS/README.txt" },
+          { from: ".env.production", to: "./MacOS/.env" },
           {
             from: VOICEVOX_ENGINE_DIR,
             to: "",
