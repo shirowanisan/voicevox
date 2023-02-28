@@ -56,7 +56,7 @@ module.exports = {
           { from: ".env.production", to: "./MacOS/.env" },
           {
             from: VOICEVOX_ENGINE_DIR,
-            to: "",
+            to: "./MacOS/",
           },
         ],
         // electron-builder installer
