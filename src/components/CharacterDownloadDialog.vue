@@ -444,13 +444,6 @@ export default defineComponent({
       isDownloading.value = true;
       downloadingUuid.value = speakerUuid;
       const appDirPath = await window.electron.appDirPath();
-      const zipPath =
-        appDirPath +
-        "/speaker_info/" +
-        speakerUuid +
-        "_" +
-        downloadInfosMap.value[speakerUuid].downloadableModel.speaker.version +
-        ".zip";
       fetch(
         downloadInfosMap.value[speakerUuid].downloadableModel.downloadPath,
         {
@@ -458,7 +451,6 @@ export default defineComponent({
         }
       )
         .then(async (res) => {
-          if (await window.electron.checkFileExists(zipPath)) return undefined;
           if (speakerUuid.match("/")) throw new Error("不正なuuid");
           const reader = res.body?.getReader();
           const contentLength = Number(res.headers?.get("Content-Length"));
@@ -482,36 +474,20 @@ export default defineComponent({
         })
         .then(async (chunksAll) => {
           if (!chunksAll) return undefined;
-          downloadedPercent.value = "zip保存中";
-          await window.electron.writeFile({
-            filePath: zipPath,
-            buffer: await chunksAll.buffer,
-          });
-        })
-        .then(async () => {
           await window.electron.removeFile({
             filePath: appDirPath + "/speaker_info/" + speakerUuid,
           });
+          return chunksAll;
         })
-        .then(async () => {
+        .then(async (chunksAll) => {
+          if (!chunksAll) return undefined;
           downloadedPercent.value = "解凍中";
-          const data = unzipSync(
-            new Uint8Array(
-              await window.electron.readFile({
-                filePath: zipPath,
-              })
-            )
-          );
+          const data = unzipSync(chunksAll);
           Object.entries(data).forEach(([filename, data]) => {
             window.electron.writeSpeakerFile({
               filePath: appDirPath + "/speaker_info/" + filename,
               buffer: data.buffer,
             });
-          });
-        })
-        .then(async () => {
-          await window.electron.removeFile({
-            filePath: zipPath,
           });
         })
         .then(() => {
