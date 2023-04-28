@@ -1,5 +1,12 @@
 [
   {
+    "version": "COEIROINK-1.7.3+VOICEVOX-0.14.5",
+    "descriptions": [
+      "settingのためのui.htmlの追加"
+    ],
+    "contributors": []
+  },
+  {
     "version": "COEIROINK-1.7.2+VOICEVOX-0.14.5",
     "descriptions": [
       "設定ファイルの保存場所不備を修正"

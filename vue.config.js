@@ -34,7 +34,7 @@ module.exports = {
             name: "COEIROINK Project file",
             description: "COEIROINK Project file",
             role: "Editor",
-            icon: "icons/vvproj." + (isMac ? "icns" : "ico"),
+            icon: "icons/ciproj." + (isMac ? "icns" : "ico"),
           },
           {
             ext: "vvpp",
